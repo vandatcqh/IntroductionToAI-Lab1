@@ -133,7 +133,7 @@ def main():
     input_dir = 'input'
     output_dir = os.path.join('output', 'UCS')
 
-    for i in range(1, 2):  # For files 01 to 10
+    for i in range(1, 6):  
         input_file = os.path.join(input_dir, f'input-{i:02d}.txt')
         output_file = os.path.join(output_dir, f'output-{i:02d}.txt')
 
