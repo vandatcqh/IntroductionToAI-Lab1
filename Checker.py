@@ -12,11 +12,11 @@ def read_input_file(input_file):
 def read_output_file(output_file):
     with open(output_file, 'r') as file:
         lines = file.readlines()
-        if len(lines) < 2:
+        if len(lines) < 3:
             print("Error: Output file does not contain enough information.")
             return None
         # The solution is on the second line
-        solution = lines[1].strip()
+        solution = lines[2].strip()
     return solution
 
 def parse_grid(grid, weights):
@@ -131,7 +131,9 @@ def simulate_solution(state, solution):
 def main():
     # Directories
     input_dir = 'input'
-    output_dir = os.path.join('output', 'UCS')
+    print("Algorithm: ", end="") 
+    alg = input()
+    output_dir = os.path.join('output', alg)
 
     for i in range(1, 6):  
         input_file = os.path.join(input_dir, f'input-{i:02d}.txt')

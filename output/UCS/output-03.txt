@@ -1,2 +1,3 @@
-Steps: 27, Node: 154305, Weight: 18, Time (ms): 1742.68, Memory (MB): 5.21
+UCS
+Steps: 27, Node: 154305, Weight: 18, Time (ms): 1813.42, Memory (MB): 5.21
 LulDururrdLrrddlUlldRdllluR
