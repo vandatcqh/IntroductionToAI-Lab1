@@ -1,197 +1,235 @@
 import psutil
 import time
 from dataclasses import dataclass
-from typing import List, Dict, Tuple, Set
+from typing import List, Tuple
 from queue import PriorityQueue
-import itertools
+import sys
+import os
 
-def print_memory_usage() -> int:
+def print_memory_usage() -> float:
     """Get current process memory usage in MB"""
     process = psutil.Process()
-    return int(process.memory_info().rss / (1024 * 1024))
+    return process.memory_info().rss / (1024 * 1024)
 
 @dataclass
 class State:
-    f: int = -1
-    x: int = -1
-    y: int = -1
-    g: int = -1
-    stones: List[List[int]] = None
-
-    def __post_init__(self):
-        if self.stones is None:
-            self.stones = []
+    x: int
+    y: int
+    stones: List[Tuple[int, int, int]]  # List of tuples (x, y, weight)
+    g: int
+    f: int
 
     def __lt__(self, other):
         if self.f != other.f:
             return self.f < other.f
-        if self.x != other.x:
-            return self.x < other.x
-        if self.y != other.y:
-            return self.y < other.y
-        if self.g != other.g:
-            return self.g < other.g
-
-        this_stones = sorted(self.stones)
-        other_stones = sorted(other.stones)
-
-        for i in range(len(this_stones)):
-            if this_stones[i] != other_stones[i]:
-                return this_stones[i] < other_stones[i]
-        return False
+        return self.g < other.g
 
     def __eq__(self, other):
         if not isinstance(other, State):
             return False
-        return (self.f == other.f and 
-                self.x == other.x and 
+        return (self.x == other.x and 
                 self.y == other.y and 
-                self.g == other.g and 
                 sorted(self.stones) == sorted(other.stones))
 
     def __hash__(self):
-        return hash((self.f, self.x, self.y, self.g, 
-                    tuple(tuple(stone) for stone in sorted(self.stones))))
+        return hash((self.x, self.y, 
+                    tuple(sorted(self.stones))))
 
 def is_valid(x: int, y: int, grid: List[str]) -> bool:
     return not (x < 0 or y < 0 or x >= len(grid) or 
                 y >= len(grid[0]) or grid[x][y] == '#')
 
 def get_heuristic(state: State, switches: List[Tuple[int, int]]) -> int:
-    """Calculate minimum cost to move stones to switches"""
-    def generate_permutations(n: int, state: State) -> int:
-        ans = float('inf')
-        for perm in itertools.permutations(range(n)):
-            var = 0
-            for i in range(n):
-                pos = perm[i]
-                var += (abs(state.stones[i][0] - switches[pos][0]) + 
-                       abs(state.stones[i][1] - switches[pos][1])) * state.stones[i][2]
-            ans = min(ans, var)
-        return ans
-    
-    return generate_permutations(len(state.stones), state)
+    """Calculate heuristic as sum of minimal weighted distances from stones to switches."""
+    total = 0
+    for stone in state.stones:
+        min_dist = min(abs(stone[0] - sx) + abs(stone[1] - sy) for sx, sy in switches)
+        total += min_dist * stone[2]
+    return total
 
 def is_goal(state: State, switches: List[Tuple[int, int]]) -> bool:
-    return get_heuristic(state, switches) == 0
+    stone_positions = {(stone[0], stone[1]) for stone in state.stones}
+    return stone_positions == set(switches)
 
-def main():
-    # Read input
-    numbers = list(map(int, input().split()))
-    grid = []
-    while True:
-        try:
-            line = input()
-            if not line:
-                break
-            grid.append(line)
-        except EOFError:
-            break
+def read_input(filename):
+    """Read and parse input file"""
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+    
+    # Read the first line containing numbers
+    first_line = lines[0].strip()
+    numbers = [int(x) for x in first_line.split()]
+    
+    # Read the grid lines
+    grid = [line.rstrip('\n') for line in lines[1:] if line.strip()]
+    
+    return numbers, grid
+
+def search(filename, id):
+    # Read input from file
+    numbers, grid = read_input(filename)
 
     start_time = time.time()
     node = 0
 
-    # Initialize game state
-    Ax = Ay = 0
+    # Create output directory and filename
+    output_dir = os.path.join('output', 'A')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    output_filename = os.path.join(output_dir, f'output-0{id}.txt')
+
+    # Initialize starting state
+    Ax = Ay = -1
     switches = []
-    start = State(stones=[])
+    start_stones = []
     pos = 0
 
+    # Process grid to find object positions
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            if grid[i][j] == '@':
+            cell = grid[i][j]
+            if cell == '@':
                 Ax, Ay = i, j
-            elif grid[i][j] == '$':
-                start.stones.append([i, j, numbers[pos]])
-                pos += 1
-            elif grid[i][j] == '.':
+            elif cell == '$':
+                if pos < len(numbers):
+                    weight = numbers[pos]
+                    start_stones.append((i, j, weight))
+                    pos += 1
+            elif cell == '.':
                 switches.append((i, j))
+            elif cell == '*':  # Stone on a switch
+                if pos < len(numbers):
+                    weight = numbers[pos]
+                    start_stones.append((i, j, weight))
+                    switches.append((i, j))
+                    pos += 1
+            # else: empty space
 
-    # Directions: left, right, up, down
-    directions = [(0, -1), (0, 1), (-1, 0), (1, 0)]
-    dir_chars = ['l', 'r', 'u', 'd']
+    if Ax == -1 or Ay == -1:
+        print("Error: Player starting position '@' not found.")
+        return
 
-    # Initialize start state
-    start.f = get_heuristic(start, switches)
-    start.x = Ax
-    start.y = Ay
-    start.g = 0
+    start_state = State(
+        x=Ax,
+        y=Ay,
+        stones=start_stones,
+        g=0,
+        f=0  # Will compute f below
+    )
 
-    # Priority queue for A* search
+    start_state.f = start_state.g + get_heuristic(start_state, switches)
+
+    # Movement directions: up, down, left, right
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    dir_chars = ['u', 'd', 'l', 'r']
+
+    # Priority queue for A* algorithm
     queue = PriorityQueue()
-    queue.put(start)
-    f_score = {start: start.f}
-    g_score = {start: start.g}
+    queue.put(start_state)
+    g_score = {start_state: start_state.g}
     before = {}
-    
-    # A* search
+
+    last = None  # Variable to store the goal state
+
+    # A* algorithm
     while not queue.empty():
         node += 1
-        top = queue.get()
-        
-        if is_goal(top, switches):
-            last = top
+        current_state = queue.get()
+
+        if is_goal(current_state, switches):
+            last = current_state
             break
 
         for v, dir_char in zip(directions, dir_chars):
-            newstate = State(
-                stones=[stone.copy() for stone in top.stones],
-                x=top.x + v[0],
-                y=top.y + v[1],
-                g=top.g
+            new_x = current_state.x + v[0]
+            new_y = current_state.y + v[1]
+
+            if not is_valid(new_x, new_y, grid):
+                continue
+
+            # Check if there is a stone at the new position
+            stone_at_new_pos = None
+            for idx, stone in enumerate(current_state.stones):
+                if (stone[0], stone[1]) == (new_x, new_y):
+                    stone_at_new_pos = (idx, stone)
+                    break
+
+            # Create new stones list
+            new_stones = [stone for stone in current_state.stones]
+            new_g = current_state.g
+
+            if stone_at_new_pos:
+                # There is a stone at new_x, new_y
+                stone_idx, stone = stone_at_new_pos
+                # Check if we can push the stone
+                push_x = new_x + v[0]
+                push_y = new_y + v[1]
+                if not is_valid(push_x, push_y, grid):
+                    continue
+                # Check if another stone is at push_x, push_y
+                if any((s[0], s[1]) == (push_x, push_y) for s in current_state.stones):
+                    continue
+                # Push the stone
+                stone_weight = stone[2]
+                new_g += stone_weight
+                # Update the stone's position
+                new_stones[stone_idx] = (push_x, push_y, stone_weight)
+                # Move the player to new_x, new_y
+                action = dir_char.upper()
+            else:
+                # No stone at new_x, new_y
+                action = dir_char.lower()
+
+            new_state = State(
+                x=new_x,
+                y=new_y,
+                stones=new_stones,
+                g=new_g,
+                f=0  # Will compute f below
             )
 
-            if is_valid(newstate.x, newstate.y, grid):
-                check1 = check2 = False
-                pos1 = -1
+            new_state.f = new_state.g + get_heuristic(new_state, switches)
 
-                for i in range(len(top.stones)):
-                    if top.stones[i][0] == newstate.x and top.stones[i][1] == newstate.y:
-                        check1 = True
-                        pos1 = i
-                    if (top.stones[i][0] == newstate.x + v[0] and 
-                        top.stones[i][1] == newstate.y + v[1]):
-                        check2 = True
+            if (new_state in g_score and new_g >= g_score[new_state]):
+                continue
 
-                if (check1 and is_valid(newstate.x + v[0], newstate.y + v[1], grid) 
-                    and not check2):
-                    newstate.g += top.stones[pos1][2]
-                    newstate.stones[pos1][0] = newstate.x + v[0]
-                    newstate.stones[pos1][1] = newstate.y + v[1]
+            before[new_state] = (current_state, action)
+            g_score[new_state] = new_g
+            queue.put(new_state)
 
-                newstate.f = newstate.g + get_heuristic(newstate, switches)
+    # Calculate time and memory usage
+    time_ms = (time.time() - start_time) * 1000
+    memory_usage = print_memory_usage()
 
-                if (newstate in f_score and 
-                    f_score[newstate] <= newstate.g + get_heuristic(newstate, switches)):
-                    continue
+    # Write results to output file
+    with open(output_filename, 'w') as f_out:
+        if last is not None:
+            # Create path string
+            path = []
+            current = last
+            while current != start_state:
+                prev_state, move = before[current]
+                path.append(move)
+                current = prev_state
 
-                before[newstate] = (top, dir_char)
-                f_score[newstate] = newstate.f
-                g_score[newstate] = newstate.g
-                queue.put(newstate)
+            path_str = ''.join(reversed(path))
+            steps = len(path)
 
-    # Generate output
-    print(f_score[last])
-    current = last
-    while current in before:
-        print(f"{current.x} {current.y}")
-        current, _ = before[current]
-    
-    print(print_memory_usage())
-    print(int((time.time() - start_time) * 1000))  # Convert to milliseconds
-    print(node)
-    
-    # Reconstruct path
-    path = []
-    current = last
-    while current in before:
-        prev_state, move = before[current]
-        if prev_state.g != current.g:
-            move = move.upper()
-        path.append(move)
-        current = prev_state
+            # Write information to file
+            f_out.write('A*\n')
+            f_out.write('Steps: {}, Nodes Expanded: {}, Total Weight: {}, Time (ms): {:.2f}, Memory (MB): {:.2f}\n'.format(
+                steps, node, last.g, time_ms, memory_usage))
+            f_out.write(path_str + '\n')
+        else:
+            f_out.write('No solution found.\n')
+            f_out.write('Nodes Expanded: {}, Time (ms): {:.2f}, Memory (MB): {:.2f}\n'.format(
+                node, time_ms, memory_usage))
 
-    print(''.join(reversed(path)))
+def main():
+    for id in range(1, 6):  # Adjust range as needed
+        input_filename = os.path.join('input', f'input-0{id}.txt')
+        print(f"Processing {input_filename}")
+        search(input_filename, id)
 
 if __name__ == "__main__":
     main()
