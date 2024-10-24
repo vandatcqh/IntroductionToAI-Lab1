@@ -1,2 +1,2 @@
-Steps: 22, Node: 29050, Weight: 9, Time (ms): 216.27, Memory (MB): 1.26
+Steps: 22, Node: 29050, Weight: 9, Time (ms): 271.11, Memory (MB): 1.26
 lldddLLuurDrdLrrrULLLL
