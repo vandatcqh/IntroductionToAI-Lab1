@@ -1,0 +1,3 @@
+A*
+Steps: 45, Weight: 26, Node: 2358, Time (ms): 42.58, Memory (MB): 24.80
+drddlUdrddlUUlldRurruuulldRDrdLrddlUruuluurDD
