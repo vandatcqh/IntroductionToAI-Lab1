@@ -1,3 +1,3 @@
 A*
-Steps: 111, Nodes Expanded: 280506, Total Weight: 123, Time (ms): 9883.49, Memory (MB): 142.89
+Steps: 111, Weight: 123, Node: 280506, Time (ms): 6109.06, Memory (MB): 140.78
 ulldllllulllddRluurDRRRRRdrrruullDurrddlLLLulllllddrUluRRRRRRdrrruullDurrddlLLulllllddrUluRRRRRdrrruullDurrddlL

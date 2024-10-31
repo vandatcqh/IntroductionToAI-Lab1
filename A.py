@@ -76,7 +76,7 @@ def search(filename, id):
     output_dir = os.path.join('output', 'A')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_filename = os.path.join(output_dir, f'output-0{id}.txt')
+    output_filename = os.path.join(output_dir, f'output-{id}.txt')
 
     # Initialize starting state
     Ax = Ay = -1
@@ -217,8 +217,8 @@ def search(filename, id):
 
             # Write information to file
             f_out.write('A*\n')
-            f_out.write('Steps: {}, Nodes Expanded: {}, Total Weight: {}, Time (ms): {:.2f}, Memory (MB): {:.2f}\n'.format(
-                steps, node, last.g, time_ms, memory_usage))
+            f_out.write('Steps: {}, Weight: {}, Node: {}, Time (ms): {:.2f}, Memory (MB): {:.2f}\n'.format(
+                steps, last.g,node, time_ms, memory_usage))
             f_out.write(path_str + '\n')
         else:
             f_out.write('No solution found.\n')
@@ -226,8 +226,8 @@ def search(filename, id):
                 node, time_ms, memory_usage))
 
 def main():
-    for id in range(1, 6):  # Adjust range as needed
-        input_filename = os.path.join('input', f'input-0{id}.txt')
+    for id in range(1,11):  # Adjust range as needed
+        input_filename = os.path.join('input', f'input-{id}.txt')
         print(f"Processing {input_filename}")
         search(input_filename, id)
 

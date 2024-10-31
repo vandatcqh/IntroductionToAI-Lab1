@@ -1,3 +1,3 @@
 UCS
-Steps: 111, Node: 420987, Weight: 123, Time (ms): 4142.99, Memory (MB): 10.03
+Steps: 111, Weight: 123, Node: 420987, Time (ms): 5260.06, Memory (MB): 10.03
 ulldllllulllddRluurDRRRRRdrrruullDurrddlLLLulllllddrUluRRRRRRdrrruullDurrddlLLulllllddrUluRRRRRdrrruullDurrddlL

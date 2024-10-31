@@ -1,3 +1,0 @@
-A*
-Steps: 38, Nodes Expanded: 18874, Total Weight: 27, Time (ms): 1105.63, Memory (MB): 28.59
-rruulUruullldlddrUdRddlUdrrruLruuuullD

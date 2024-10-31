@@ -153,10 +153,10 @@ def Search(file_path, id_file):
     # Run UCS
     ucs_solver = UCS(start_state)
     solution, sum_weight, total_time, max_memory, cnt_node = ucs_solver.ucs()
-    with open(f"output/UCS/output-0{id_file}.txt", "w") as file:
+    with open(f"output/UCS/output-{id_file}.txt", "w") as file:
         if solution:
             file.write("UCS\n")
-            file.write(f"Steps: {len(solution)}, Node: {cnt_node}, Weight: {sum_weight}, Time (ms): {total_time:.2f}, Memory (MB): {max_memory / 1048576:.2f}\n")
+            file.write(f"Steps: {len(solution)}, Weight: {sum_weight}, Node: {cnt_node}, Time (ms): {total_time:.2f}, Memory (MB): {max_memory / 1048576:.2f}\n")
             file.write(str(solution) + "\n")
         else:
             file.write("No solution found.\n")
@@ -164,7 +164,7 @@ def Search(file_path, id_file):
 
 
 if __name__ == "__main__":
-    for i in range(1, 6):  # Loop from 1 to 5
-        file_path = f"input/input-0{i}.txt"  # Construct the file path dynamically
+    for i in range(1,11):  # Loop from 1 to 5
+        file_path = f"input/input-{i}.txt"  # Construct the file path dynamically
         Search(file_path, i)  # Call the Search function with the file path
 
