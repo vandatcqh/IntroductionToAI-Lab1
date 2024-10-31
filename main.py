@@ -15,7 +15,7 @@ def play_game(window, level=1, **widgets):
         widgets['prev_button'].hide()
     else:
         widgets['prev_button'].show()
-    if level >= 5:
+    if level >= 10:
         widgets['next_button'].hide()
     else:
         widgets['next_button'].show()

@@ -158,7 +158,7 @@ def sidebar_widgets(window):
     )
     astarman_button = Button(
         window, 1055, 280, 130, 40, text='Run A*', radius=5,
-        font=pygame.font.SysFont('Verdana', 14, bold=True),
+        font=pygame.font.SysFont('Verdana', 18, bold=True),
         onClick=lambda: pygame.event.post(pygame.event.Event(SOLVE_ASTARMAN_EVENT)),
         borderColor='black', borderThickness=2,
         colour=(55, 175, 225),       
