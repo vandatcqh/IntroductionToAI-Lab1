@@ -76,7 +76,7 @@ def search(filename, id):
     output_dir = os.path.join('output', 'A')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_filename = os.path.join(output_dir, f'output-{id}.txt')
+    output_filename = os.path.join(output_dir, f'output-{id:02d}.txt')
 
     # Initialize starting state
     Ax = Ay = -1
@@ -227,7 +227,7 @@ def search(filename, id):
 
 def main():
     for id in range(1,11):  # Adjust range as needed
-        input_filename = os.path.join('input', f'input-{id}.txt')
+        input_filename = os.path.join('input', f'input-{id:02d}.txt')
         print(f"Processing {input_filename}")
         search(input_filename, id)
 

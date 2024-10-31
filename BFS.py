@@ -139,8 +139,8 @@ def main():
     os.makedirs(output_directory, exist_ok=True)  
 
     for i in range(1, 11): 
-        input_file = os.path.join(input_directory, f'input-{i}.txt')  
-        output_file = os.path.join(output_directory, f'output-{i}.txt')  
+        input_file = os.path.join(input_directory, f'input-{i:02d}.txt')  
+        output_file = os.path.join(output_directory, f'output-{i:02d}.txt')  
 
         weights, grid = read_input(input_file)
         initial_state = parse_grid(grid, weights)
