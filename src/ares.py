@@ -22,6 +22,8 @@ class Ares(Sprite):
         self.y = y
 
     def update(self, key=None):
+        move_increment = 0
+        weight_increment = 0
         move = None
         if key:
             key = key.upper()
@@ -43,7 +45,13 @@ class Ares(Sprite):
             target_elem = self.game.puzzle[target]
             if not (target_elem and target_elem.obj and isinstance(target_elem.obj, Obstacle)):
                 is_box = isinstance(target_elem.obj, Stone)
-                if not is_box or (is_box and target_elem.obj.can_move(move)):
+                stone_weight = 0
+                if not is_box:
+                    can_move = True
+                else:
+                    stone_weight = target_elem.obj.can_move(move)
+                    can_move = stone_weight > 0
+                if can_move:
                     curr_elem = self.game.puzzle[curr]
                     self.rect.y, self.rect.x = target[0] * 64, target[1] * 64
                     self.y, self.x = target
@@ -51,8 +59,10 @@ class Ares(Sprite):
                     curr_elem.obj = None
                     target_elem.char = '*' if not target_elem.ground else '%'
                     target_elem.obj = self
-                    return 1
-        return 0
+                    move_increment = 1
+                    weight_increment = stone_weight
+                    return move_increment, weight_increment
+        return 0, 0
 
     def __del__(self):
         self.kill()

@@ -9,8 +9,8 @@ from src.widgets import sidebar_widgets
 
 def play_game(window, level=1, **widgets):
     moves = 0
+    sum_weight = 0
     show_solution = False
-    #widgets['paths'].transparency = False
     if level <= 1:
         widgets['prev_button'].hide()
     else:
@@ -23,6 +23,7 @@ def play_game(window, level=1, **widgets):
     game = Game(level=level, window=window)
     game_loop = True
     solved_via_algorithm = False
+
     while game_loop:
         events = pygame.event.get()
         for event in events:
@@ -69,7 +70,7 @@ def play_game(window, level=1, **widgets):
                         f'{alg}\n{ans}\n{move_sequence}',
                         10, 'red'
                     )
-                    moves = play_solution(move_sequence, game, widgets, show_solution, moves)
+                    moves, sum_weight = play_solution(move_sequence, game, widgets, show_solution, moves, sum_weight)
                     if game.is_level_complete():
                         solved_via_algorithm = True
                 except Exception as e:
@@ -90,7 +91,7 @@ def play_game(window, level=1, **widgets):
                         f'{alg}\n{ans}\n{move_sequence}',
                         10, 'red'
                     )
-                    moves = play_solution(move_sequence, game, widgets, show_solution, moves)
+                    moves, sum_weight = play_solution(move_sequence, game, widgets, show_solution, moves, sum_weight)
                     if game.is_level_complete():
                         solved_via_algorithm = True
                 except Exception as e:
@@ -98,27 +99,70 @@ def play_game(window, level=1, **widgets):
                         '[A*] Solution Not Found!\nError: ' + str(e),
                         20,
                     )
+            elif event.type == SOLVE_DFS_EVENT:
+                print('Loading solution from output file for DFS\n')
+                show_solution = True
+                try:
+                    with open(f'output/DFS/output-{level:02d}.txt', 'r') as f:
+                        lines = f.readlines()
+                        alg = lines[0].strip()
+                        ans = lines[1].strip()
+                        move_sequence = lines[2].strip()
+                    widgets['paths'].set_text(
+                        f'{alg}\n{ans}\n{move_sequence}',
+                        10, 'red'
+                    )
+                    moves, sum_weight = play_solution(move_sequence, game, widgets, show_solution, moves, sum_weight)
+                    if game.is_level_complete():
+                        solved_via_algorithm = True
+                except Exception as e:
+                    widgets['paths'].set_text(
+                        '[DFS] Solution Not Found!\nError: ' + str(e),
+                        20,
+                    )
+            elif event.type == SOLVE_BFS_EVENT:
+                print('Loading solution from output file for BFS\n')
+                show_solution = True
+                try:
+                    with open(f'output/BFS/output-{level:02d}.txt', 'r') as f:
+                        lines = f.readlines()
+                        alg = lines[0].strip()
+                        ans = lines[1].strip()
+                        move_sequence = lines[2].strip()
+                    widgets['paths'].set_text(
+                        f'{alg}\n{ans}\n{move_sequence}',
+                        10, 'red'
+                    )
+                    moves, sum_weight = play_solution(move_sequence, game, widgets, show_solution, moves, sum_weight)
+                    if game.is_level_complete():
+                        solved_via_algorithm = True
+                except Exception as e:
+                    widgets['paths'].set_text(
+                        '[BFS] Solution Not Found!\nError: ' + str(e),
+                        20,
+                    )
         game.floor_group.draw(window)
         game.switch_group.draw(window)
         game.object_group.draw(window)
-        game.number_group.draw(window)  
-        game.ares_group.draw(window) 
+        game.number_group.draw(window)
+        game.ares_group.draw(window)
         pygame_widgets.update(events)
         widgets['label'].draw()
         widgets['moves_label'].set_moves(f' Moves - {moves} ', 20)
+        widgets['weight_label'].set_moves(f' Weight - {sum_weight} ', 20)
+
         if show_solution:
             widgets['paths'].draw()
         pygame.display.update()
         if game.is_level_complete():
             print(f'Testcase Complete! - {moves} moves')
-            #widgets['level_clear'].draw()
             pygame.display.update()
             game_loop = False
             wait = True
             while wait:
                 for event in pygame.event.get():
-                    if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                        wait = False    
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        wait = False  
     del game
     print('Objects cleared!\n')
     if solved_via_algorithm:
@@ -151,7 +195,7 @@ def main():
             quit()
         reset = game_data.get('reset', -1)
         if reset == -1:
-            level = min(level + 1, 5)
+            level = min(level + 1, 10)
         elif reset == 0:
             pass
         else:

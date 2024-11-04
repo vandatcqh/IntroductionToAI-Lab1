@@ -5,9 +5,7 @@ from pygame.sprite import Sprite
 class Number(Sprite):
     def __init__(self, *groups, x, y, index):
         super().__init__(*groups)
-       
         index_str = f"{index:02d}"
-        
         self.image = pygame.image.load(f'img/number-{index_str}.png')
         self.image = pygame.transform.scale(self.image, [64, 64])
         self.rect = pygame.Rect(x * 64, y * 64, 64, 64)
@@ -26,7 +24,7 @@ class Stone(Sprite):
         self.x = x
         self.y = y
         self.number = None
-        self.index = index 
+        self.index = index  # Weight of the stone
         if number_group is not None and index is not None:
             self.number = Number(number_group, x=x, y=y, index=index)
 
@@ -47,8 +45,8 @@ class Stone(Sprite):
             target_elem.char = '@' if not target_elem.ground else '$'
             target_elem.obj = self
             self.update_sprite()
-            return True
-        return False
+            return self.index  # Return the weight of the stone
+        return 0  # Return 0 if the stone can't move
 
     def update_sprite(self):
         self.image = self.sprite 

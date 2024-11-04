@@ -31,7 +31,7 @@ class Label:
     def draw(self):
         pygame.draw.rect(
             self.window,
-            pygame.Color('blue'),
+            pygame.Color('green'),
             (self.rect.x,
              self.rect.y,
              self.rect.width,
@@ -146,8 +146,28 @@ def sidebar_widgets(window):
         pressedColour=(255, 0, 0),
         textColour=(255, 255, 255)
     )
+    dfs_button = Button(
+        window, 1055, 250, 130, 40, text='Run DFS', radius=5,
+        font=pygame.font.SysFont('Verdana', 18, bold=True),
+        onClick=lambda: pygame.event.post(pygame.event.Event(SOLVE_DFS_EVENT)),
+        borderColor='black', borderThickness=2,
+        colour=(55, 175, 225),       
+        hoverColour=(0, 255, 0),   
+        pressedColour=(255, 0, 0), 
+        textColour=(255, 255, 255)
+    )
+    bfs_button = Button(
+        window, 1055, 320, 130, 40, text='Run BFS', radius=5,
+        font=pygame.font.SysFont('Verdana', 18, bold=True),
+        onClick=lambda: pygame.event.post(pygame.event.Event(SOLVE_BFS_EVENT)),
+        borderColor='black', borderThickness=2,
+        colour=(55, 175, 225),       
+        hoverColour=(0, 255, 0),   
+        pressedColour=(255, 0, 0), 
+        textColour=(255, 255, 255)
+    )
     ucs_button = Button(
-        window, 1055, 220, 130, 40, text='Run UCS', radius=5,
+        window, 1055, 390, 130, 40, text='Run UCS', radius=5,
         font=pygame.font.SysFont('Verdana', 18, bold=True),
         onClick=lambda: pygame.event.post(pygame.event.Event(SOLVE_UCS_EVENT)),
         borderColor='black', borderThickness=2,
@@ -157,7 +177,7 @@ def sidebar_widgets(window):
         textColour=(255, 255, 255)
     )
     astarman_button = Button(
-        window, 1055, 280, 130, 40, text='Run A*', radius=5,
+        window, 1055, 460, 130, 40, text='Run A*', radius=5,
         font=pygame.font.SysFont('Verdana', 18, bold=True),
         onClick=lambda: pygame.event.post(pygame.event.Event(SOLVE_ASTARMAN_EVENT)),
         borderColor='black', borderThickness=2,
@@ -167,6 +187,7 @@ def sidebar_widgets(window):
         textColour=(255, 255, 255)
     )
     moves = Label(window, f' Moves - 0 ', 1055, 75, 20)
+    weight = Label(window, f' Weight - 0 ', 1055, 600, 20)
     paths = MultilineLabel(window, f'ALG\nANS\nPath', 64, 0, 20)
     return {
         'restart': restart,
@@ -177,4 +198,7 @@ def sidebar_widgets(window):
         'ucs': ucs_button,
         'paths': paths,
         'astarman': astarman_button,
+        'dfs': dfs_button,
+        'bfs': bfs_button,
+        'weight_label': weight,
     }

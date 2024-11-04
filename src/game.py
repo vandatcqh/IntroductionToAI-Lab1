@@ -73,7 +73,8 @@ class Game:
         try:
             with open(self.path) as f:
                 lines = f.readlines()
-                weights = lines[0].strip()
+                weights = list(map(int, lines[0].strip().split()))
+                print(weights)
                 grid_lines = lines[1:]
                 self.puzzle_size = (len(grid_lines), len(grid_lines[0].rstrip('\n')))
                 pad_x = (self.width // 64 - self.puzzle_size[1] - 2) // 2
@@ -98,7 +99,7 @@ class Game:
                                 y=i + pad_y,
                                 game=self,
                                 number_group=self.number_group,
-                                index=stone_index  
+                                index=weights[stone_index-1]  
                             )
                             stone_index += 1  
                         elif c == '@':  
@@ -117,7 +118,7 @@ class Game:
                                 y=i + pad_y,
                                 game=self,
                                 number_group=self.number_group,
-                                index=stone_index  
+                                index=weights[stone_index-1]  
                             )
                             stone_index += 1  
                         elif c == '%':  
