@@ -136,16 +136,6 @@ def sidebar_widgets(window):
         borderColor='black', borderThickness=2,
         colour=(191, 236, 255)
     )
-    restart = Button(
-        window, 1055, 130, 130, 40, text='Restart', radius=5,
-        font=pygame.font.SysFont('Verdana', 18, bold=True),
-        onClick=lambda: pygame.event.post(pygame.event.Event(RESTART_EVENT)),
-        borderColor='black', borderThickness=2,
-        colour=(55, 175, 225),      
-        hoverColour=(0, 255, 0),  
-        pressedColour=(255, 0, 0),
-        textColour=(255, 255, 255)
-    )
     dfs_button = Button(
         window, 1055, 250, 130, 40, text='Run DFS', radius=5,
         font=pygame.font.SysFont('Verdana', 18, bold=True),
@@ -187,10 +177,9 @@ def sidebar_widgets(window):
         textColour=(255, 255, 255)
     )
     moves = Label(window, f' Moves - 0 ', 1055, 75, 20)
-    weight = Label(window, f' Weight - 0 ', 1055, 600, 20)
+    weight = Label(window, f' Weight - 0 ', 1055, 130, 20)
     paths = MultilineLabel(window, f'ALG\nANS\nPath', 64, 0, 20)
     return {
-        'restart': restart,
         'moves_label': moves,
         'prev_button': prev_button,
         'next_button': next_button,

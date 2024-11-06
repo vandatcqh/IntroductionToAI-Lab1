@@ -19,7 +19,7 @@ def play_game(window, level=1, **widgets):
         widgets['next_button'].hide()
     else:
         widgets['next_button'].show()
-    widgets['label'].set_text(f'Level {level}', 30)
+    widgets['label'].set_text(f'Level {level}', 25)
     game = Game(level=level, window=window)
     game_loop = True
     solved_via_algorithm = False
@@ -32,14 +32,6 @@ def play_game(window, level=1, **widgets):
                 return {
                     'keep_playing': False,
                     'reset': -1,
-                }
-            elif event.type == RESTART_EVENT:
-                game_loop = False
-                print(f'Restarting level {level}\n')
-                window.fill((0, 0, 0, 0))
-                return {
-                    'keep_playing': True,
-                    'reset': level,
                 }
             elif event.type == PREVIOUS_EVENT:
                 game_loop = False

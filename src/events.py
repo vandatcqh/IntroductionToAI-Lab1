@@ -1,6 +1,5 @@
 import pygame
 
-RESTART_EVENT = pygame.USEREVENT + 1
 PREVIOUS_EVENT = pygame.USEREVENT + 2
 NEXT_EVENT = pygame.USEREVENT + 3
 SOLVE_UCS_EVENT = pygame.USEREVENT + 4
